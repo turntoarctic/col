@@ -1,4 +1,4 @@
-const Paste = () => {
+const Clipboard = () => {
     return (
         <div>
             <h1>Paste</h1>
@@ -6,4 +6,4 @@ const Paste = () => {
     )
 }
 
-export default Paste
+export default Clipboard

@@ -1,15 +1,15 @@
 import { Routes, Route } from "react-router";
 import App from "./App";
 
-import Paste from "./pages/paste";
-import Note from "./pages/note/note";
+import Clipboard from "./pages/clipboard";
+import Write from "./pages/write";
 
 export const Router = () => {
   return (
     <Routes>
       <Route path="/" element={<App />}>
-        <Route index path="/paste" element={<Paste />} />
-        <Route path="/note" element={<Note />} />
+        <Route index path="/clipboard" element={<Clipboard />} />
+        <Route path="/write" element={<Write />} />
       </Route>
     </Routes>
   );
