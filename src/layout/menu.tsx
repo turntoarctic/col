@@ -72,7 +72,7 @@ export function Menu() {
           })}
           <Separator orientation="vertical" className="h-full" />
 
-          {dock.setUp.map((item) => {
+          {/* {dock.setUp.map((item) => {
             return (
               <DockIcon className="bg-black/10 dark:bg-white/10" key={item.key}>
                 <Tooltip>
@@ -85,7 +85,7 @@ export function Menu() {
                 </Tooltip>
               </DockIcon>
             );
-          })}
+          })} */}
         </Dock>
       </TooltipProvider>
     </div>

@@ -1,3 +1,5 @@
+"use client";
+
 import { cva, type VariantProps } from "class-variance-authority";
 import {
   motion,
@@ -17,6 +19,7 @@ export interface DockProps extends VariantProps<typeof dockVariants> {
   iconMagnification?: number;
   iconDistance?: number;
   direction?: "top" | "middle" | "bottom";
+  orientation?: "horizontal" | "vertical";
   children: React.ReactNode;
 }
 
@@ -25,7 +28,18 @@ const DEFAULT_MAGNIFICATION = 60;
 const DEFAULT_DISTANCE = 140;
 
 const dockVariants = cva(
-  "supports-backdrop-blur:bg-white/10 supports-backdrop-blur:dark:bg-black/10 flex h-[58px] w-max items-center justify-center gap-2 rounded-2xl border p-2 backdrop-blur-md"
+  "supports-backdrop-blur:bg-white/10 supports-backdrop-blur:dark:bg-black/10 mx-auto mt-8 flex h-[58px] w-max items-center justify-center gap-2 rounded-2xl border p-2 backdrop-blur-md",
+  {
+    variants: {
+      orientation: {
+        horizontal: "flex-row",
+        vertical: "flex-col h-max w-[58px]",
+      },
+    },
+    defaultVariants: {
+      orientation: "horizontal",
+    },
+  },
 );
 
 const Dock = React.forwardRef<HTMLDivElement, DockProps>(
@@ -37,21 +51,25 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
       iconMagnification = DEFAULT_MAGNIFICATION,
       iconDistance = DEFAULT_DISTANCE,
       direction = "middle",
+      orientation = "horizontal",
       ...props
     },
-    ref
+    ref,
   ) => {
     const mouseX = useMotionValue(Infinity);
+    const mouseY = useMotionValue(Infinity);
 
     const renderChildren = () => {
       return React.Children.map(children, (child) => {
         if (React.isValidElement(child) && child.type === DockIcon) {
           return React.cloneElement(child, {
             ...child.props,
-            mouseX: mouseX,
+            mouseX: orientation === "horizontal" ? mouseX : undefined,
+            mouseY: orientation === "vertical" ? mouseY : undefined,
             size: iconSize,
             magnification: iconMagnification,
             distance: iconDistance,
+            orientation,
           });
         }
         return child;
@@ -61,10 +79,16 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
     return (
       <motion.div
         ref={ref}
-        onMouseMove={(e) => mouseX.set(e.pageX)}
-        onMouseLeave={() => mouseX.set(Infinity)}
+        onMouseMove={(e) => {
+          mouseX.set(e.pageX);
+          mouseY.set(e.pageY);
+        }}
+        onMouseLeave={() => {
+          mouseX.set(Infinity);
+          mouseY.set(Infinity);
+        }}
         {...props}
-        className={cn(dockVariants({ className }), {
+        className={cn(dockVariants({ orientation, className }), {
           "items-start": direction === "top",
           "items-center": direction === "middle",
           "items-end": direction === "bottom",
@@ -73,7 +97,7 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
         {renderChildren()}
       </motion.div>
     );
-  }
+  },
 );
 
 Dock.displayName = "Dock";
@@ -84,6 +108,8 @@ export interface DockIconProps
   magnification?: number;
   distance?: number;
   mouseX?: MotionValue<number>;
+  mouseY?: MotionValue<number>;
+  orientation?: "horizontal" | "vertical";
   className?: string;
   children?: React.ReactNode;
   props?: PropsWithChildren;
@@ -94,6 +120,8 @@ const DockIcon = ({
   magnification = DEFAULT_MAGNIFICATION,
   distance = DEFAULT_DISTANCE,
   mouseX,
+  mouseY,
+  orientation = "horizontal",
   className,
   children,
   ...props
@@ -101,16 +129,22 @@ const DockIcon = ({
   const ref = useRef<HTMLDivElement>(null);
   const padding = Math.max(6, size * 0.2);
   const defaultMouseX = useMotionValue(Infinity);
+  const defaultMouseY = useMotionValue(Infinity);
 
-  const distanceCalc = useTransform(mouseX ?? defaultMouseX, (val: number) => {
-    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
-    return val - bounds.x - bounds.width / 2;
-  });
+  const distanceCalc = useTransform(
+    orientation === "horizontal" ? mouseX ?? defaultMouseX : mouseY ?? defaultMouseY,
+    (val: number) => {
+      const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, y: 0, width: 0, height: 0 };
+      return orientation === "horizontal"
+        ? val - bounds.x - bounds.width / 2
+        : val - bounds.y - bounds.height / 2;
+    },
+  );
 
   const sizeTransform = useTransform(
     distanceCalc,
     [-distance, 0, distance],
-    [size, magnification, size]
+    [size, magnification, size],
   );
 
   const scaleSize = useSpring(sizeTransform, {
@@ -125,7 +159,7 @@ const DockIcon = ({
       style={{ width: scaleSize, height: scaleSize, padding }}
       className={cn(
         "flex aspect-square cursor-pointer items-center justify-center rounded-full",
-        className
+        className,
       )}
       {...props}
     >

@@ -1,8 +1,20 @@
+import { EditorProvider } from "@/components/editor/EditorProvider";
+import Sidebar from "@/components/editor/Sidebar";
+import TopBar from "@/components/editor/TopBar";
+import EditorContainer from "@/components/editor/EditorContainer";
 
 export default function Write() {
   return (
     <div>
-      <h1>Write</h1>
+      <EditorProvider>
+        <div className="app">
+          <Sidebar />
+          <div className="main-content">
+            <TopBar />
+            <EditorContainer />
+          </div>
+        </div>
+      </EditorProvider>
     </div>
   );
 }

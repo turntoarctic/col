@@ -1,0 +1,22 @@
+.dock-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    background-color: #ccc;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.dock-item:hover {
+    transform: scale(1.2);
+}
+
+.dock-item:hover ~ .dock-item {
+    transform: scale(1.1);
+}
+
+.dock-item:not(:hover) ~ .dock-item:hover {
+    transform: scale(1.1);
+} 

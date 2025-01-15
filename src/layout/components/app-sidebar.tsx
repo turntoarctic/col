@@ -22,7 +22,6 @@ const data = {
     {
       title: "Playground",
       url: "#",
-      isActive: true,
       items: [
         {
           title: "History",

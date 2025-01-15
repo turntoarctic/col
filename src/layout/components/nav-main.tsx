@@ -1,4 +1,5 @@
-import { ChevronRight, CirclePlus } from "lucide-react";
+import { ChevronRight, CirclePlus, Plus } from "lucide-react";
+import SubItem from "./sub-item";
 import { Link } from "react-router";
 
 import {
@@ -34,22 +35,30 @@ export function NavMain({
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="flex items-center justify-between">
-        <span>Note</span>
-        <CirclePlus className="cursor-pointer" />
+        <SubItem name="Note">
+
+        </SubItem>
+        {/* <span>Note</span> */}
       </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
-            <SidebarMenuItem>
+            <SidebarMenuItem className="group hover:bg-gray-100">
               <SidebarMenuButton asChild tooltip={item.title}>
-                <Link to={item.url}>
+                <Link
+                  to={item.url}
+                  className="flex items-center justify-between w-full"
+                >
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>
               {item.items?.length ? (
                 <>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuAction className="data-[state=open]:rotate-90">
+                    <SidebarMenuAction
+                      showOnHover
+                      className="data-[state=open]:rotate-90"
+                    >
                       <ChevronRight />
                       <span className="sr-only">Toggle</span>
                     </SidebarMenuAction>
@@ -57,7 +66,10 @@ export function NavMain({
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
+                        <SidebarMenuSubItem
+                          key={subItem.title}
+                          className="group hover:bg-gray-200"
+                        >
                           <SidebarMenuSubButton asChild>
                             <Link to={subItem.url}>
                               <span>{subItem.title}</span>
