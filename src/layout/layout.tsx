@@ -1,11 +1,11 @@
 import React from "react";
-import { Dock, DockIcon } from "../components/dock";
-import {DockDemo} from "./dock";
+import { DockMenu } from "./dock";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div>
-      <DockDemo></DockDemo>
+    <div className="h-full w-full flex ">
+      <DockMenu></DockMenu>
+      <div className="flex-1 no-scrollbar">{children}</div>
     </div>
   );
 }

@@ -1,8 +1,6 @@
 import { CalendarIcon, HomeIcon, MailIcon, PencilIcon } from "lucide-react";
-// import Link from "next/link";
 import React from "react";
-
-// import { ModeToggle } from "@/components/mode-toggle";
+import { useNavigate } from "react-router"; // 使用 React Router 进行路由跳转
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -15,7 +13,6 @@ import { cn } from "@/lib/utils";
 import { Dock, DockIcon } from "@/components/dock";
 
 export type IconProps = React.HTMLAttributes<SVGElement>;
-const Link  = <></>
 
 const Icons = {
   calendar: (props: IconProps) => <CalendarIcon {...props} />,
@@ -61,96 +58,105 @@ const Icons = {
   ),
 };
 
-const DATA = {
-  navbar: [
-    { href: "#", icon: HomeIcon, label: "Home" },
-    { href: "#", icon: PencilIcon, label: "Blog" },
-  ],
-  contact: {
-    social: {
-      GitHub: {
-        name: "GitHub",
-        url: "#",
-        icon: Icons.github,
-      },
-      LinkedIn: {
-        name: "LinkedIn",
-        url: "#",
-        icon: Icons.linkedin,
-      },
-      X: {
-        name: "X",
-        url: "#",
-        icon: Icons.x,
-      },
-      email: {
-        name: "Send Email",
-        url: "#",
-        icon: Icons.email,
-      },
-    },
-  },
-};
+// 定义 actionType 类型
+type ActionType = "navigate" | "modal";
 
-export function DockDemo() {
+const DATA = [
+  {
+    type: "link",
+    href: "/", // 本地路由
+    icon: HomeIcon,
+    label: "Home",
+    actionType: "navigate" as ActionType, // 跳转路由
+  },
+  {
+    type: "link",
+    href: "/blog", // 本地路由
+    icon: PencilIcon,
+    label: "Blog",
+    actionType: "navigate" as ActionType, // 跳转路由
+  },
+  { type: "separator" },
+  {
+    type: "link",
+    href: "#",
+    icon: Icons.github,
+    label: "GitHub",
+    actionType: "modal" as ActionType, // 弹窗
+  },
+  {
+    type: "link",
+    href: "#",
+    icon: Icons.linkedin,
+    label: "LinkedIn",
+    actionType: "modal" as ActionType, // 弹窗
+  },
+  {
+    type: "link",
+    href: "#",
+    icon: Icons.x,
+    label: "X",
+    actionType: "modal" as ActionType, // 弹窗
+  },
+  {
+    type: "link",
+    href: "#",
+    icon: Icons.email,
+    label: "Send Email",
+    actionType: "modal" as ActionType, // 弹窗
+  },
+  { type: "separator" },
+  // {
+  //   type: "theme",
+  //   icon: ModeToggle,
+  //   label: "Theme",
+  //   actionType: "navigate" as ActionType, // 切换主题
+  // },
+];
+
+export function DockMenu() {
+  const navigate = useNavigate(); // 使用 React Router 的 navigate 函数
+
+  const handleClick = (item: (typeof DATA)[number]) => {
+    if (item.type === "link") {
+      if (item.actionType === "modal") {
+        // 弹窗逻辑
+        alert(`Open modal for: ${item.label}`);
+      } else if (item.actionType === "navigate") {
+        // 使用 React Router 跳转路由
+        navigate(item.href);
+      }
+    }
+  };
+
   return (
     <TooltipProvider>
-        <Dock direction="middle" orientation="vertical" >
-          {DATA.navbar.map((item) => (
+      <Dock direction="middle" orientation="vertical" className="h-full">
+        {DATA.map((item, index) =>
+          item.type === "separator" ? (
+            <Separator key={index} orientation="horizontal" />
+          ) : (
             <DockIcon key={item.label}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <a
-                    href={item.href}
+                  <button
+                    onClick={() => handleClick(item)}
                     aria-label={item.label}
                     className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      "size-12 rounded-full"
+                      buttonVariants({ variant: "ghost", size: "icon" })
                     )}
                   >
-                    <item.icon className="size-4" />
-                  </a>
+                    {item.icon && <item.icon className="size-4" />}
+                  </button>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent side="right">
                   <p>{item.label}</p>
                 </TooltipContent>
               </Tooltip>
             </DockIcon>
-          ))}
-          <Separator orientation="horizontal" />
-          {Object.entries(DATA.contact.social).map(([name, social]) => (
-            <DockIcon key={name}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <a
-                    href={social.url}
-                    aria-label={social.name}
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      "size-12 rounded-full"
-                    )}
-                  >
-                    <social.icon className="size-4" />
-                  </a>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{name}</p>
-                </TooltipContent>
-              </Tooltip>
-            </DockIcon>
-          ))}
-          <Separator orientation="horizontal" />
-          <DockIcon>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                {/* <ModeToggle className="rounded-full" /> */}
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Theme</p>
-              </TooltipContent>
-            </Tooltip>
-          </DockIcon>
-        </Dock>
-      </TooltipProvider>
+          )
+        )}
+      </Dock>
+    </TooltipProvider>
   );
 }
